@@ -16,10 +16,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from homework.views import home  # Import the home view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('homework/', include('homework.urls')),  # Include homework app URLs
-    path('users/', include('users.urls')),  # Include users app URLs
-
+    path('homework/', include('homework.urls')),
+    path('users/', include('users.urls')),
+    path('', home, name='home'),  # This sets the home page
 ]

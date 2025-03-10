@@ -61,7 +61,7 @@ MIDDLEWARE = [
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],  # You can add template directories here if you want custom templates
+        'DIRS': [BASE_DIR / "templates"],  # You can add template directories here if you want custom templates
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
