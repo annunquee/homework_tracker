@@ -1,12 +1,16 @@
-import ReactDOM from 'react-dom/client'
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+// import './index.css';
+import App from './App';
+//import reportWebVitals from './reportWebVitals';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
-const WelcomeText = () => {
-  const target = 'world'
-  return <h1>Hello, {target}!</h1>
-}
 
-ReactDOM.createRoot(document.getElementById('root')).render(
-  <div>
-    <WelcomeText />
-  </div>
-)
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);
+
+// reportWebVitals();
