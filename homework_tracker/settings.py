@@ -28,7 +28,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'your-default-secret-key')  # Default for l
 DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 
 # Allowable hosts for production/deployment
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',') if os.getenv('ALLOWED_HOSTS') else []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1',  'homework_tracker.onrender.com']
 
 # Application definition
 INSTALLED_APPS = [
@@ -49,6 +49,7 @@ ROOT_URLCONF = 'homework_tracker.urls'
 # Middleware configuration
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',  # Ensure this is correctly placed
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -79,15 +80,16 @@ WSGI_APPLICATION = 'homework_tracker.wsgi.application'
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'  # URL for serving static files
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [
     BASE_DIR / "static",  # Custom static directory inside the project
 ]
 
-# Database configuration
-DATABASE_URL = os.getenv('DATABASE_URL', 'sqlite:///' + str(BASE_DIR / 'db.sqlite3'))
+
 DATABASES = {
-    'default': dj_database_url.config(default=DATABASE_URL)
-}
+    "default": dj_database_url.config(default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}")}  # Loads connection string from DATABASE_URL
 
 # User model configuration
 AUTH_USER_MODEL = os.getenv('AUTH_USER_MODEL', 'users.User')  # Custom user model (from users app)
+
