@@ -18,51 +18,60 @@ import dj_database_url
 # Load environment variables from the .env file
 load_dotenv()
 
-# BASE_DIR definition
+# Base directory of the project
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# SECRET_KEY setup
+# Secret Key & Debug Mode
 SECRET_KEY = os.getenv('SECRET_KEY', 'your-default-secret-key')  # Default for local development
-
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 
-# Allowable hosts for production/deployment
-ALLOWED_HOSTS = ['localhost', '127.0.0.1',  'homework_tracker.onrender.com']
+# Allowed Hosts
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    'homework_tracker.onrender.com',
+]
 
-# Application definition
+# Installed Applications
 INSTALLED_APPS = [
+    # Default Django apps
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'users',  # Custom user app
+
+    # Third-party apps
+    'corsheaders',
+    'rest_framework',
+    
+    # Custom apps
+    'users',   # Custom user app
     'homework',  # Homework-related app
-    'games',  # Games-related app
 ]
 
-# Ensure ROOT_URLCONF is set correctly
-ROOT_URLCONF = 'homework_tracker.urls'
-
-# Middleware configuration
+# Middleware Configuration
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    "whitenoise.middleware.WhiteNoiseMiddleware",
-    'django.contrib.sessions.middleware.SessionMiddleware',  # Ensure this is correctly placed
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',  # Ensure correct order
-    'django.contrib.messages.middleware.MessageMiddleware',  # Ensure correct order
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-# Template configuration for admin
+# URL Configuration
+ROOT_URLCONF = 'homework_tracker.urls'
+
+# Templates Configuration
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / "templates"],  # You can add template directories here if you want custom templates
+        'DIRS': [BASE_DIR / "templates"],  # Custom templates directory
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -75,21 +84,50 @@ TEMPLATES = [
     },
 ]
 
-# WSGI application
+# WSGI Application
 WSGI_APPLICATION = 'homework_tracker.wsgi.application'
 
-# Static files (CSS, JavaScript, Images)
-STATIC_URL = '/static/'  # URL for serving static files
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
-STATIC_ROOT = BASE_DIR / "staticfiles"
-STATICFILES_DIRS = [
-    BASE_DIR / "static",  # Custom static directory inside the project
+# Database Configuration
+DATABASES = {
+    "default": dj_database_url.config(default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}")
+}
+
+# Authentication
+AUTH_USER_MODEL = 'users.User'  # Use 'users.CustomUser' if applicable
+
+# Django REST Framework Configuration
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
+    ],
+    'DEFAULT_PARSER_CLASSES': [
+        'rest_framework.parsers.JSONParser',
+        'rest_framework.parsers.FormParser',
+        'rest_framework.parsers.MultiPartParser',
+    ],
+}
+
+# CORS Settings
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',
+    'https://yourfrontenddomain.com',  # Replace with actual frontend URL
 ]
 
+# Static & Media Files
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / "staticfiles"
+STATICFILES_DIRS = [BASE_DIR / "static"]
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
-DATABASES = {
-    "default": dj_database_url.config(default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}")}  # Loads connection string from DATABASE_URL
+# Security Settings
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:3000',
+    'https://frontenddomain.com',  # Add actual domain
+]
 
-# User model configuration
-AUTH_USER_MODEL = os.getenv('AUTH_USER_MODEL', 'users.User')  # Custom user model (from users app)
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
 
+# Default Auto Field
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
