@@ -1,5 +1,7 @@
 from django import forms
 from django.forms import inlineformset_factory
+from django.contrib.auth.forms import UserCreationForm
+from users.models import User  # Import your custom user model
 from .models import DailyHomework, HomeworkTask
 
 
@@ -8,10 +10,10 @@ class DailyHomeworkForm(forms.ModelForm):
         widget=forms.DateInput(attrs={'type': 'date'}),
         required=True
     )
+
     class Meta:
         model = DailyHomework
         fields = ['date']
-
 
 
 class HomeworkTaskForm(forms.ModelForm):
@@ -22,6 +24,7 @@ class HomeworkTaskForm(forms.ModelForm):
         model = HomeworkTask
         fields = ['subject', 'description']
 
+
 # Create an inline formset for HomeworkTask linked to DailyHomework:
 HomeworkTaskFormSet = inlineformset_factory(
     DailyHomework,
@@ -31,9 +34,17 @@ HomeworkTaskFormSet = inlineformset_factory(
     can_delete=True    # Allow tasks to be deleted if needed
 )
 
+
 class ChildCreationForm(forms.Form):
     username = forms.CharField(max_length=150)
     first_name = forms.CharField(required=False)
     last_name = forms.CharField(required=False)
     email = forms.EmailField(required=False)
     password = forms.CharField(widget=forms.PasswordInput, required=True)
+
+
+# 🔹 Custom User Creation Form (Fix for Missing Import)
+class CustomUserCreationForm(UserCreationForm):
+    class Meta:
+        model = User  # Use your custom user model
+        fields = ("username", "email", "password1", "password2")  # Include required fields

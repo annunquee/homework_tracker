@@ -1,15 +1,17 @@
 from django.test import TestCase
-from django.contrib.auth.models import User
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import TestCase
-from django.contrib.auth.models import User
-from django.core.files.uploadedfile import SimpleUploadedFile
-from .forms import UserRegisterForm, UserUpdateForm, ProfileUpdateForm
-
-# Create your tests here.
+from users.models import User  # Import your custom user model
+from homework.forms import CustomUserCreationForm  # Import the form correctly
 
 class UserFormsTests(TestCase):
     def setUp(self):
-        # Set up a user and profile for the tests
         self.user = User.objects.create_user(username='testuser', password='12345')
-       
+
+    def test_custom_user_creation_form_valid_data(self):
+        form_data = {
+            "username": "newuser",
+            "email": "newuser@example.com",
+            "password1": "strongpassword123",
+            "password2": "strongpassword123",
+        }
+        form = CustomUserCreationForm(data=form_data)
+        self.assertTrue(form.is_valid())  # Ensure form validation passes
