@@ -17,7 +17,6 @@ import dj_database_url
 
 # Load environment variables from the .env file
 load_dotenv()
-
 # Base directory of the project
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -29,8 +28,10 @@ DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
-    'homework_tracker.onrender.com',
+    'homework_tracker.onrender.com',  # Add production host here
 ]
+
+
 
 # Installed Applications
 INSTALLED_APPS = [
@@ -87,13 +88,13 @@ TEMPLATES = [
 # WSGI Application
 WSGI_APPLICATION = 'homework_tracker.wsgi.application'
 
-# Database Configuration
+# Database Configuration (use DATABASE_URL for production)
 DATABASES = {
     "default": dj_database_url.config(default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}")
 }
 
 # Authentication
-AUTH_USER_MODEL = 'users.User'  # Use 'users.CustomUser' if applicable
+AUTH_USER_MODEL = 'users.User'  # Make sure your custom user model is correctly defined
 
 # Django REST Framework Configuration
 REST_FRAMEWORK = {
@@ -110,8 +111,8 @@ REST_FRAMEWORK = {
 
 # CORS Settings
 CORS_ALLOWED_ORIGINS = [
-    'http://localhost:3000',
-    'https://yourfrontenddomain.com',  # Replace with actual frontend URL
+    'http://localhost:3000',  # Local dev frontend
+    'https://yourfrontenddomain.com',  # Replace with actual frontend URL in prod
 ]
 
 # Static & Media Files
@@ -122,8 +123,8 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # Security Settings
 CSRF_TRUSTED_ORIGINS = [
-    'http://localhost:3000',
-    'https://frontenddomain.com',  # Add actual domain
+    'http://localhost:3000',  # Local dev frontend
+    'https://frontenddomain.com',  # Add your production domain here
 ]
 
 SECURE_BROWSER_XSS_FILTER = True
@@ -131,3 +132,10 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 
 # Default Auto Field
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+# Check if this is set anywhere in your settings.py (it might be redirecting to HTTPS)
+SECURE_SSL_REDIRECT = False  # Ensure this is False to avoid forced HTTPS redirects
+
+# Check for any other secure settings:
+SECURE_HSTS_SECONDS = 0  # Disable HTTP Strict Transport Security
+SECURE_HSTS_PRELOAD = False
+SECURE_HSTS_INCLUDE_SUBDOMAINS = False
