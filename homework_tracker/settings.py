@@ -21,15 +21,15 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Secret Key & Debug Mode
-SECRET_KEY = os.getenv('SECRET_KEY', 'your-default-secret-key')  # Default for local development
+SECRET_KEY = os.getenv('SECRET_KEY', 'your-default-secret-key')
 DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 
-# Allowed Hosts
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
-    'homework_tracker.onrender.com',  # Add production host here
+    'homework_tracker.onrender.com',
 ]
+
 
 
 
@@ -93,6 +93,11 @@ DATABASES = {
     "default": dj_database_url.config(default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}")
 }
 
+#DATABASES = {
+    #'default': dj_database_url.config(conn_max_age=600)
+#}
+
+
 # Authentication
 AUTH_USER_MODEL = 'users.User'  # Make sure your custom user model is correctly defined
 
@@ -121,6 +126,30 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / "media"
+
+# Email Configuration
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+# Debugging Emails Locally
+if DEBUG:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# Superuser Credentials (For Automated Superuser Creation)
+DJANGO_SUPERUSER_USERNAME = os.getenv('DJANGO_SUPERUSER_USERNAME', 'admin')
+DJANGO_SUPERUSER_EMAIL = os.getenv('DJANGO_SUPERUSER_EMAIL', 'admin@example.com')
+DJANGO_SUPERUSER_PASSWORD = os.getenv('DJANGO_SUPERUSER_PASSWORD', 'password')
+
+
+
+
 # Security Settings
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:3000',  # Local dev frontend
@@ -139,3 +168,6 @@ SECURE_SSL_REDIRECT = False  # Ensure this is False to avoid forced HTTPS redire
 SECURE_HSTS_SECONDS = 0  # Disable HTTP Strict Transport Security
 SECURE_HSTS_PRELOAD = False
 SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
