@@ -27,10 +27,8 @@ DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
-    'homework_tracker.onrender.com',
+    'homework-tracker.onrender.com',
 ]
-
-
 
 
 # Installed Applications
@@ -89,13 +87,13 @@ TEMPLATES = [
 WSGI_APPLICATION = 'homework_tracker.wsgi.application'
 
 # Database Configuration (use DATABASE_URL for production)
-DATABASES = {
-    "default": dj_database_url.config(default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}")
-}
-
 #DATABASES = {
-    #'default': dj_database_url.config(conn_max_age=600)
+    #"default": dj_database_url.config(default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}")
 #}
+
+DATABASES = {
+    'default': dj_database_url.config(conn_max_age=600)
+}
 
 
 # Authentication
