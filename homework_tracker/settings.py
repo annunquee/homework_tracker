@@ -86,15 +86,21 @@ TEMPLATES = [
 # WSGI Application
 WSGI_APPLICATION = 'homework_tracker.wsgi.application'
 
-# Database Configuration (use DATABASE_URL for production)
-#DATABASES = {
-    #"default": dj_database_url.config(default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}")
-#}
 
-DATABASES = {
-    'default': dj_database_url.config(conn_max_age=600)
-}
+# Detect if running on Render
+IS_RENDER = "RENDER" in os.environ
 
+if IS_RENDER:
+    DATABASES = {
+        'default': dj_database_url.config(default=os.environ.get("DATABASE_URL"), conn_max_age=600)
+    }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 # Authentication
 AUTH_USER_MODEL = 'users.User'  # Make sure your custom user model is correctly defined
