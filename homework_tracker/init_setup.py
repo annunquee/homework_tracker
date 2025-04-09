@@ -3,7 +3,7 @@ import django
 from django.core.management import execute_from_command_line
 from django.contrib.auth import get_user_model
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "Django_daycare.settings")
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'homework_tracker.settings')
 django.setup()
 
 # Run migrations
