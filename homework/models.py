@@ -24,4 +24,4 @@ class ChildProgress(models.Model):
 
     def __str__(self):
         status = "Completed" if self.completed else "Not Completed"
-        return f"{self.child.user.username} - {self.homework_task.subject} ({status})"
+        return f"{self.child.child_user.username} - {self.homework_task.subject} ({status})"

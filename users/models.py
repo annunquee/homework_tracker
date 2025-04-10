@@ -20,5 +20,8 @@ class Child(models.Model):
         related_name="children",
         limit_choices_to={'role': 'parent'},
         null=True,
-        blank=True  # <-- allow parent to be empty
+        blank=True  # <-- Allow parent to be empty
     )
+
+    def __str__(self):
+        return f"Child Profile: {self.child_user.username}"

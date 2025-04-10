@@ -103,8 +103,8 @@ else:
     }
 
 # Authentication
-AUTH_USER_MODEL = 'users.User'  # Make sure your custom user model is correctly defined
-
+AUTH_USER_MODEL = 'users.User'
+  
 # Django REST Framework Configuration
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': [
