@@ -1,24 +1,26 @@
 import os
 import django
-from django.core.management import execute_from_command_line, call_command
+from django.core.management import execute_from_command_line
 from django.contrib.auth import get_user_model
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'homework_tracker.settings')
 django.setup()
 
-# STEP 1 & 2: Migrate the apps
 try:
-    # Migrate users app first (custom user model)
+    # Migrate users app first (custom user model and Child model)
     execute_from_command_line(["manage.py", "migrate", "users", "--noinput"])
 
-    # Migrate the rest
-    execute_from_command_line(["manage.py", "migrate", "--noinput"])
-    print("✅ Migrations applied successfully.")
+    # Migrate homework app (depends on users.Child)
+    execute_from_command_line(["manage.py", "migrate", "homework", "--noinput"])
 
+    # Migrate everything else
+    execute_from_command_line(["manage.py", "migrate", "--noinput"])
+    print("✅ All migrations applied.")
 except Exception as e:
     print(f"❌ Migration failed: {e}")
+    exit(1)
 
-# STEP 3: Create superuser
+# Create superuser
 try:
     User = get_user_model()
     username = os.getenv("DJANGO_SUPERUSER_USERNAME")
@@ -28,8 +30,8 @@ try:
             email=os.getenv("DJANGO_SUPERUSER_EMAIL"),
             password=os.getenv("DJANGO_SUPERUSER_PASSWORD"),
         )
-        print("✅ Superuser created successfully.")
+        print("✅ Superuser created.")
     else:
-        print("⚠️ Superuser already exists or username env var is missing.")
+        print("⚠️ Superuser already exists or env var is missing.")
 except Exception as e:
     print(f"❌ Superuser creation failed: {e}")
