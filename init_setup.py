@@ -6,11 +6,14 @@ from django.contrib.auth import get_user_model
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'homework_tracker.settings')
 django.setup()
 
-# Run migrations
+# STEP 1: Migrate users app first (important for custom user model)
+execute_from_command_line(["manage.py", "migrate", "users", "--noinput"])
+
+# STEP 2: Migrate the rest
 execute_from_command_line(["manage.py", "migrate", "--noinput"])
 print("✅ Migrations applied successfully.")
 
-# Create superuser if it doesn't exist
+# STEP 3: Create superuser
 User = get_user_model()
 if not User.objects.filter(username=os.getenv("DJANGO_SUPERUSER_USERNAME")).exists():
     User.objects.create_superuser(
