@@ -33,3 +33,32 @@ A cool app for tween kids, “pre teen” where homework is made less boring by 
 
 
 Render link = https://homework-tracker-5z7y.onrender.com
+
+ the usuall python manage.py runserver was not running due to some unforseen reasons i just couldn't have it running the usual locall way and working with limited time.
+local host = python manage.py runserver 8080
+
+# project contains 2 dashborads :
+teacher's dashboard
+child dashboard
+
+# only teacher can logininto homework hub
+login = teacher1
+password = Teacher1
+
+# when loggedin as admin you can't navigate through teachers dashboard or hub have to logout and login as teacher
+because only teacher can create and delete homework
+
+admin login = Admin
+admin password = passpasspass
+
+did'nt have enough time to work around the parent dashboard, so at the moment parent cant login or view child's progress
+due to the limited time on my hands because i lost 2 weeks working on fixing an old project for regrading.
+
+# API implementation:
+pokemon game used as an API
+
+# child dashboad
+the child user can also go back to past homework that wasn't finished to be completed
+
+# Testing was implented 3x
+with coverage report total of 440 164 63%

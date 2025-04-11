@@ -86,10 +86,6 @@ def child_dashboard(request):
 def parent_dashboard(request):
     return render(request, "parent_dashboard.html")
 
-####################################################
-############## REACT API FUNCTIONS ##################
-####################################################
-
 # Create Child View
 @csrf_exempt
 @api_view(['POST'])
