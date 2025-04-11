@@ -1,11 +1,12 @@
 from django.shortcuts import render
 
 
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.utils.timezone import now
 from .models import DailyHomework, HomeworkTask, ChildProgress
 from .forms import DailyHomeworkForm, HomeworkTaskFormSet
+ 
 
 
 
@@ -22,7 +23,7 @@ def is_parent(user):
     """Check if the user is a parent"""
     return user.is_authenticated and user.role == "parent"
 
-
+################################TEACHER FUNCTIONALITY #############################
 # Teacher: Create Homework this stores the daily homework and tasks into the DB
 #@login_required
 #@user_passes_test(is_teacher)
@@ -65,5 +66,14 @@ def teacher_dashboard(request):
     return render(request, 'homework/teacher_dashboard.html', {'homeworks': homeworks})
 
 
+def homework_detail(request, pk):
+    homework = get_object_or_404(DailyHomework, pk=pk)
+    tasks = homework.tasks.all()  # Adjust if your model relation is different
+    return render(request, 'homework/homework_detail.html', {'homework': homework, 'tasks': tasks})
+
+
 def home(request):
     return render(request, "home.html")  # This will look for a template named home.html
+
+
+#############################CHILD FUNCTIONALITY ######################################

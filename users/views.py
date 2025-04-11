@@ -8,6 +8,8 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.views.decorators.csrf import csrf_exempt
 from .serializers import TeacherRegistrationSerializer, ChildCreationSerializer
 from .models import Child
+from .forms import TeacherRegistrationForm
+from django.contrib import messages
 
 User = get_user_model()
 
@@ -20,6 +22,19 @@ def is_child(user):
 
 def is_parent(user):
     return user.is_authenticated and user.role == "parent"
+
+########## TEACHER REGISTER - Only teachers can register online ###########
+def register_teacher(request):
+    if request.method == 'POST':
+        form = TeacherRegistrationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Your teacher account has been created. You can now log in.')
+            return redirect('login')  # Make sure this matches your login URL name
+    else:
+        form = TeacherRegistrationForm()  # ← This was missing in your GET case!
+
+    return render(request, 'registration/register_teacher.html', {'form': form})
 
 # User Login View
 @csrf_exempt  # Disable CSRF for API endpoints if you haven't set it up properly
