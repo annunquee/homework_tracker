@@ -28,7 +28,7 @@ ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
     'homework-tracker.onrender.com',
-    'homework-tracker-5z7y.onrender.com/',
+    'homework-tracker-5z7y.onrender.com',
 ]
 
 
