@@ -3,12 +3,15 @@ from django.shortcuts import render
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth import get_user_model
 from django.utils.timezone import now
-from .models import DailyHomework, HomeworkTask, ChildProgress
-from .forms import DailyHomeworkForm, HomeworkTaskFormSet
- 
+from django.urls import reverse
+from .models import DailyHomework, HomeworkTask, ChildProgress, Child 
+from .forms import DailyHomeworkForm, HomeworkTaskFormSet, ChildCreationForm
+from datetime import date
+import requests
 
-
+User = get_user_model()
 
 # Helper Functions
 def is_teacher(user):
@@ -72,8 +75,171 @@ def homework_detail(request, pk):
     return render(request, 'homework/homework_detail.html', {'homework': homework, 'tasks': tasks})
 
 
+# TEACHER FUNCTIONALITY TO CREATE A cHILD #
+def create_child_view(request):
+    if request.method == 'POST':
+        form = ChildCreationForm(request.POST)
+        if form.is_valid():
+            # 1) Create the User with role='child'
+            username = form.cleaned_data['username']
+            first_name = form.cleaned_data['first_name']
+            last_name = form.cleaned_data['last_name']
+            email = form.cleaned_data['email']
+            password = form.cleaned_data['password']
+
+            child_user = User.objects.create_user(
+                username=username,
+                password=password,
+                first_name=first_name,
+                last_name=last_name,
+                email=email
+            )
+            child_user.role = 'child'
+            child_user.save()
+
+            # 2) Create the Child record, linking the teacher to this user
+            Child.objects.create(
+                child_user=child_user,
+                teacher=request.user,
+                # parent stays None if you want to skip it
+            )
+
+            # Optionally, log the child in or just redirect
+            # login(request, child_user)  # Usually not needed here
+            return redirect('teacher_dashboard')  # or some "success" page
+    else:
+        form = ChildCreationForm()
+
+    return render(request, 'homework/create_child.html', {'form': form})
+
+
+
 def home(request):
     return render(request, "home.html")  # This will look for a template named home.html
 
 
 #############################CHILD FUNCTIONALITY ######################################
+
+
+@login_required
+def child_dashboard(request, hw_id=None):
+    # # 1) Identify the Child object
+    try:
+        child = Child.objects.get(child_user=request.user)
+    except Child.DoesNotExist:
+        return redirect('home')  # or raise 404
+
+    # 2) Determine which DailyHomework we’re showing
+    #    If 'hw_id' is given, use that; otherwise load the latest available for this teacher up to (and including) today.
+    teacher = child.teacher
+    
+    if hw_id:
+        daily_homework = get_object_or_404(DailyHomework, pk=hw_id, teacher=teacher)
+    else:
+        # No hw_id => show the latest daily homework up to today's date
+        daily_homework = (
+            DailyHomework.objects
+            .filter(teacher=teacher, date__lte=date.today())
+            .order_by('-date')
+            .first()
+        )
+
+    if not daily_homework:
+        # No homework found => pass None to the template
+        context = {
+            'daily_homework': None,
+            'prev_url': '#',
+            'next_url': '#',
+        }
+        return render(request, 'homework/child_dashboard.html', context)
+
+    # 3) Figure out “previous” and “next” homework
+    #    “previous” => the DailyHomework with a date less than the current one, ordered descending, pick first.
+    previous_hw = (
+        DailyHomework.objects
+        .filter(teacher=teacher, date__lt=daily_homework.date)
+        .order_by('-date')
+        .first()
+    )
+    next_hw = (
+        DailyHomework.objects
+        .filter(teacher=teacher, date__gt=daily_homework.date)
+        .order_by('date')
+        .first()
+    )
+
+    # Build the URLs for the template
+    if previous_hw:
+        prev_url = reverse('child_dashboard', kwargs={'hw_id': previous_hw.id})
+    else:
+        prev_url = '#'
+    if next_hw:
+        next_url = reverse('child_dashboard', kwargs={'hw_id': next_hw.id})
+    else:
+        next_url = '#'
+
+    # 4) Now handle tasks for the chosen daily_homework
+    tasks = HomeworkTask.objects.filter(daily_homework=daily_homework)
+
+    if request.method == 'POST':
+        # gather ticked checkboxes
+        completed_task_ids = request.POST.getlist('completed_tasks')
+        
+        for task in tasks:
+            progress, created = ChildProgress.objects.get_or_create(
+                child=child,
+                homework_task=task,
+                date=daily_homework.date,
+                defaults={'completed': False}
+            )
+            # Mark completed if the child ticked the box
+            progress.completed = str(task.id) in completed_task_ids
+            progress.save()
+
+        # Check if all tasks are completed
+        if len(completed_task_ids) == len(tasks):
+            return redirect('child_game_page')
+
+        # If not all completed, stay on the same homework date
+        return redirect('child_dashboard', hw_id=daily_homework.id)
+
+    # 5) On GET, build progress_list
+    progress_list = []
+    for task in tasks:
+        progress = ChildProgress.objects.filter(
+            child=child,
+            homework_task=task,
+            date=daily_homework.date
+        ).first()
+        progress_list.append({
+            'task': task,
+            'completed': progress.completed if progress else False
+        })
+
+    context = {
+        'daily_homework': daily_homework,
+        'progress_list': progress_list,
+        'prev_url': prev_url,
+        'next_url': next_url,
+    }
+    return render(request, 'homework/child_dashboard.html', context)
+
+# Load the game page. 
+@login_required
+def child_game_page(request):
+    return render(request, "homework/child_game_page.html")
+
+
+# When a child clicks a pokemon on the game page, it calls this function
+# this function then gets the details of that pokemon from the external API 
+# and passes it to the pokemon_detial
+def pokemon_detail(request, pokemon_id):
+    response = requests.get(f'https://pokeapi.co/api/v2/pokemon/{pokemon_id}/')
+    if response.status_code == 200:
+        pokemon_data = response.json()
+    else:
+        pokemon_data = None
+
+    return render(request, 'homework/pokemon_detail.html', {
+        'pokemon': pokemon_data
+    })

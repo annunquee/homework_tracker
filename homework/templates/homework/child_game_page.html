@@ -1,32 +1,44 @@
-<!-- homework/templates/homework/child_base.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>{% block title %}Child Dashboard{% endblock title %}</title>
-  <!-- Bootstrap CSS (CDN) -->
-  <link 
-    rel="stylesheet" 
-    href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
-  >
-</head>
-<body>
-  <nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand" href="#">Child Portal</a>
-    <!-- If you want a nav menu, you can add items here -->
-  </nav>
+{% extends 'homework/child_base.html' %}
 
+{% block content %}
   <div class="container mt-4">
-    {% block content %}
-    {% endblock content %}
+    <h2>Catch a Pokémon!</h2>
+    <div id="pokemon-gallery" class="row mt-4"></div>
   </div>
 
-  <!-- Optional Bootstrap JS and dependencies -->
-  <script 
-    src="https://code.jquery.com/jquery-3.5.1.slim.min.js">
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const maxPokemonId = 151;
+      const numberToShow = 20;
+      const usedIds = new Set();
+
+      
+      function getRandomId() {
+        let id;
+        do {
+          id = Math.floor(Math.random() * maxPokemonId) + 1;
+        } while (usedIds.has(id));
+        usedIds.add(id);
+        return id;
+      }
+
+      for (let i = 0; i < numberToShow; i++) {
+        const id = getRandomId();
+        fetch(`https://pokeapi.co/api/v2/pokemon/${id}`)
+          .then(res => res.json())
+          .then(pokemon => {
+            const image = pokemon.sprites.front_default;
+            const name = pokemon.name;
+            const card = `
+              <div class="col-6 col-md-4 mb-4 text-center">
+                <a href="/homework/pokemon/${pokemon.id}/">
+                  <img src="${image}" alt="${name}" class="img-fluid" style="max-height: 150px;">
+                </a>
+              </div>
+            `;
+            document.getElementById('pokemon-gallery').insertAdjacentHTML('beforeend', card);
+          });
+      }
+    });
   </script>
-  <script 
-    src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js">
-  </script>
-</body>
-</html>
+{% endblock content %}

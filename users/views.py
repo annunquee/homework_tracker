@@ -23,6 +23,10 @@ def is_child(user):
 def is_parent(user):
     return user.is_authenticated and user.role == "parent"
 
+def home_page(request):
+     return render(request, 'home.html')
+
+
 ########## TEACHER REGISTER - Only teachers can register online ###########
 def register_teacher(request):
     if request.method == 'POST':
