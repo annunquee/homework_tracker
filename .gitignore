@@ -3,6 +3,7 @@ __pycache__/
 *.pyc
 .ipnb_checkpoints/
 .env
+.env_example
 .vs/
 .vscode/
 .python-version
