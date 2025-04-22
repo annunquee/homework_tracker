@@ -50,6 +50,8 @@ due to the limited time on my hands because i lost 2 weeks working on fixing an 
 
 # API implementation:
 pokemon game used as an API
+can be viewed here
+https://pokeapi.co/api/v2/pokemon
 
 # child dashboad
 the child user can also go back to past homework that wasn't finished to be completed
