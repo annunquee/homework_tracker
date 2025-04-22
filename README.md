@@ -31,7 +31,7 @@ A cool app for tween kids, “pre teen” where homework is made less boring by 
 * Homework
 
 
-
+github link = https://github.com/annunquee/homework_tracker.git
 Render link = https://homework-tracker-5z7y.onrender.com
 
  the usuall python manage.py runserver was not running due to some unforseen reasons i just couldn't have it running the usual locall way and working with limited time.
